@@ -1,0 +1,90 @@
+PROJETO 05:
+===========
+Alunos: Pícoli e Sarmanho
+
+f1<60Hz
+f2>4.2MHz
+P<5% (em 60Hz)
+26dB de ganho inversor
+4Vpp sobre RL=1k
+
+Transistor Q3:
+==============
+
+VE2 >= 4*VBEtyp logo VE2 >= 3V
+VCE2>= 3V+2V => VCE2 >= 5V
+VC2 >= 8V => VE3 >= 8.7V
+Escolho VE3=10.4V (20% de folga)
+Vcc-VE3 >= 4*VEBtyp logo Vcc >= 13.4V
+iE3>0 => IE3>2V/(1k||R8)
+Escolho Vcc=15V
+ilp=2V/1k=2mA
+Escolho IE3 aprox. 10mA
+RE3 aprox (15V-10.4V)/10mA = 460 ohm => escolho RE3=470 ohm (R8)
+Logo IE3 = (15V-10.4V)/470 = 9.78mA
+ie3p = 2V*(1/470+1/1k) = 6.25mA < IE3 (OK)
+do manual, hFE3 aprox 180 => IB3=54,0uA e IC3=9.72mA, além de VB3=10.4-0.7=9.7V
+
+Transistor Q2:
+==============
+IC2>=20*IB3 => IC2 >= 1080uA (=>fT=130Mhz, OK)
+OBS: preciso que VRC2>2V
+VRC2=Vcc-VB3=15V-9.7V=5.3V (OK)
+RC2=5.3V/(1080uA-54uA)=5166 ohm , escolho RC2 = 4k7
+Logo, IC2=(5.3V/4k7)+54uA=1.18mA
+VE2 aprox 3V => VCE2 aprox 6.7V
+do manual, hFE2 aprox 175 => IB2 aprox 6.74uA e VBE2 = 0.644V
+RE2 aprox 3V/(1.18mA+6.74uA)=2528 ohm, escolho RE2=2k7
+Logo, VE2 = (1.18mA+6.74uA)*2k7=3.20V e VCE2=6.5V
+VB2 = VE2+VBE2 = 3.20+0.644V = 3.844V
+
+Transistor Q1:
+==============
+IE1>=20*IB2=135uA, por causa da fT, escolho IE1 aprox 600uA
+RE1 aprox 3.844/593uA = 6480 ohm, escolho RE1 = 5k6
+Logo, IE1=686uA => IC1 aprox 686uA e VCE1 = 15V-3.844V = 11.16V
+hFE1 aprox 170 => IB1 aprox 4.05uA
+VBE1 aprox 0.620V => VB1 = VE1+VBE1=3.844V+0.675V=4.52V
+
+Gy=(GxVB1+IB1)/(Vcc-VB1)
+Gy=0.431Gx+3.86e-7
+Gx+Gy=1.431Gx+3.86e-7 >= 20/((hFE1+1)*RE1) = 2.088e-5, 20 em vez de 10 por causa dos múltiplos acoplamentos DC
+Gx>=1.4321e-05=> Rx<= 69.8k, escolho Rx = 56k (por causa dos 10% de tolerância)
+Gx=1.78e-05 => Gy aprox 8.0824e-06 => Ry aprox 123.73k ohm, escolho Ry=120k
+
+Cálculo de RE2':
+================
+RE2||RE2' =< RC2(chapéu)/20 aprox RC2/20= 235 ohm
+4k7||RE2' =< 235 => RE2' <= 247 ohm, escolho RE2'=220 ohm (substituir por 180 ohm, para dar 26dB)
+
+Capacitores de acoplamento:
+===========================
+P <= 5% em 60Hz
+Para termos capacitores iguais,
+	 T/Rin	   T/Rout	 T(1/Rin+1/Rout)
+C = ------- = -------- = ---------------
+	  P1		 P2			P1+P2
+T=1/f=1/60=16.67ms
+Desprezando a resistência de entrada de Q1 no cálculo de Rin, temos Rin aprox Rx||Ry = 56k||120k=38.2k
+Se levarmos em conta a resistência de entrada de Q1, temos Rin=38.2k||Rin',
+onde Rin' = hie1+hFE1*RE1 = 1k+170*5k6 = 953k => Rin=36.7k
+No cálculo de Rout, desprezaremos a resistência de saída do emissor (de dezenas de ohm ou menor), Rout aprox RL = 1k
+P1+P2< 0.05
+Portanto, C = 342uF, escolho 390uF para os C infinitos.
+
+Desprezando a impedância de saída do emissor comum (supondo ser da ordem de dezenas de ohm ou menor), fazemos
+wmin*RE2'*C4>10 => C4 > 10/(377*180)=147uF, escolho C4=180uF (em paralelo com C4'=39nF)
+
+Desacoplamento LC:
+==================
+Usaremos apenas o desacoplamento LC com L=100uH e C3=100uF (em paralelo com C3'=22nF)
+
+Frequência de corte:
+====================
+Cin3 = 5.65pF (obtida simulando o estágio de saída no MatLAB)
+Do VCB do Q2 temos que Cu2 = 3.0pF
+CC2=Cu2+Cin3+Cw
+CC2 aprox 3pF+5.65pF+2pF = 10.65pF
+fH=1/(2*pi*RC2(chapéu)*CC2);
+RC2 aprox 2k2 e CC2 aprox 11pF => fH aprox 6.6 MHz
+
