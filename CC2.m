@@ -1,23 +1,24 @@
-% simula o CC por tensões nodais para prj 5
+% simula o CC de saída por tensões nodais para prj 5
 clc; close all; clear
 
 % syms vi f
-Nf=40;% nr de frequencias
+Nf=80;% nr de frequencias
 vi=0.1;
 fL=60;
 fH=4.2e6;
-f=logspace(log10(fL),log10(fH),Nf);
+f=logspace(log10(fL),log10(1.2*fH),Nf);
 w=2*pi*f;
 
-% parâmetros para VCE=5V e IC = 4mA
+% parâmetros para -VCE=10V e IC = 9.78mA
 rx=50;Gx=1/rx;
 Cu=4.5e-12;
-Cp=104.2e-12;
+Cp=8e-12%104.2e-12;
 CL=15e-12;% capacitância de ponta de prova, etc
-rp=750;Gp=1/rp;
+rp=650;Gp=1/rp;
 RL=1e3;
 RE=470;
-gm=-0.293;%-0.155;
+hfe=220;% entretanto, se a fT for de 150MHz, em 4.2MHz, hfe aprox 35
+gm=-hfe/rp;%-0.155;TODO: descobrir pq precisa mudar o sinal
 
 Habs=zeros(1,Nf);
 Zin=zeros(1,Nf);
@@ -48,4 +49,7 @@ xlabel('frequency(Hz)');
 ylabel('|H|(dB)');
 grid on
 figure;
-semilogx(f,Cin);
+semilogx(f,(1e12)*Cin);
+xlabel('frequency(Hz)');
+ylabel('C_{in}(pF)');
+grid on

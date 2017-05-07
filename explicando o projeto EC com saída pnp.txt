@@ -15,7 +15,9 @@ VE2 >= 4*VBEtyp logo VE2 >= 3V
 VCE2>= 3V+2V => VCE2 >= 5V
 VC2 >= 8V => VE3 >= 8.7V
 Escolho VE3=10.4V (20% de folga)
-Vcc-VE3 >= 4*VEBtyp logo Vcc >= 13.4V
+Vcc-VE3 >= 4*VEBtyp, além de
+Vcc-VE3 >= 2V (para evitar clipar a saída no semiciclo positivo)
+Logo Vcc >= 13.4V
 iE3>0 => IE3>2V/(1k||R8)
 Escolho Vcc=15V
 ilp=2V/1k=2mA
@@ -27,35 +29,44 @@ do manual, hFE3 aprox 180 => IB3=54,0uA e IC3=9.72mA, além de VB3=10.4-0.7=9.7V
 
 Transistor Q2:
 ==============
-IC2>=20*IB3 => IC2 >= 1080uA (=>fT=130Mhz, OK)
-OBS: preciso que VRC2>2V
+IC2>=20*IB3 => IC2 >= 1080uA (=>fT=130MHz, OK)
+OBS: preciso que VRC2>2V para evitar clipagem do sinal
 VRC2=Vcc-VB3=15V-9.7V=5.3V (OK)
-RC2=5.3V/(1080uA-54uA)=5166 ohm , escolho RC2 = 4k7
-Logo, IC2=(5.3V/4k7)+54uA=1.18mA
+RC2=5.3V/(1080uA-54uA)=5166 ohm , escolheria RC2 = 4k7, mas RC2 influencia no polo do circuito
+Cin3 = 5pF (obtida simulando o CC no MatLAB)
+Rin3 = 600 ohm (da forma como foi polarizado, o polo do CC de saída está próximo de 4.2MHz), IGNORAR
+Do VCB do Q2 temos que Cu2 = 3.0pF
+CC2=Cu2+Cin3+Cw
+CC2 aprox 3pF+5pF+2pF = 10pF
+fH=1/(2*pi*RC2(chapéu)*CC2);
+RC2 = 4k7 e CC2 aprox 10pF => fH aprox 3.4 MHz
+Por isso, faço RC2 = 2k2 => fH aprox 7.2MHz
+
+Logo, IC2=(5.3V/2k2)+54uA=2.46mA
 VE2 aprox 3V => VCE2 aprox 6.7V
-do manual, hFE2 aprox 175 => IB2 aprox 6.74uA e VBE2 = 0.644V
-RE2 aprox 3V/(1.18mA+6.74uA)=2528 ohm, escolho RE2=2k7
-Logo, VE2 = (1.18mA+6.74uA)*2k7=3.20V e VCE2=6.5V
-VB2 = VE2+VBE2 = 3.20+0.644V = 3.844V
+do manual, hFE2 aprox 175 => IB2 aprox 14.1uA e VBE2 = 0.660V
+RE2 aprox 3V/(2.46mA+14.1uA)=1212 ohm, escolho RE2=1k2
+Logo, VE2 = (2.46mA+14.1uA)*1k2=2.97V e VCE2=6.73V
+VB2 = VE2+VBE2 = 2.97+0.660V = 3.63V
 
 Transistor Q1:
 ==============
-IE1>=20*IB2=135uA, por causa da fT, escolho IE1 aprox 600uA
-RE1 aprox 3.844/593uA = 6480 ohm, escolho RE1 = 5k6
-Logo, IE1=686uA => IC1 aprox 686uA e VCE1 = 15V-3.844V = 11.16V
-hFE1 aprox 170 => IB1 aprox 4.05uA
-VBE1 aprox 0.620V => VB1 = VE1+VBE1=3.844V+0.675V=4.52V
+IE1>=20*IB2=282uA, por causa da fT, escolho IE1 aprox 600uA
+RE1 aprox 3.63/586uA = 6195 ohm, escolho RE1 = 5k6
+Logo, IE1=662uA => IC1 aprox 662uA e VCE1 = 15V-3.63V = 11.37V
+hFE1 aprox 170 => IB1 aprox 3.89uA
+VBE1 aprox 0.620V => VB1 = VE1+VBE1=3.63V+0.675V=4.31V
 
 Gy=(GxVB1+IB1)/(Vcc-VB1)
-Gy=0.431Gx+3.86e-7
-Gx+Gy=1.431Gx+3.86e-7 >= 20/((hFE1+1)*RE1) = 2.088e-5, 20 em vez de 10 por causa dos múltiplos acoplamentos DC
-Gx>=1.4321e-05=> Rx<= 69.8k, escolho Rx = 56k (por causa dos 10% de tolerância)
-Gx=1.78e-05 => Gy aprox 8.0824e-06 => Ry aprox 123.73k ohm, escolho Ry=120k
+Gy=0.403Gx+3.64e-7
+Gx+Gy=1.403Gx+3.64e-7 >= 20/((hFE1+1)*RE1) = 2.088e-5, 20 em vez de 10 por causa dos múltiplos acoplamentos DC
+Gx>=1.4622e-05=> Rx<= 68.4k, escolho Rx = 56k (por causa dos 10% de tolerância)
+Gx=1.78e-05 => Gy aprox 7.5604e-06 => Ry aprox 132.2k ohm, escolho Ry=120k
 
 Cálculo de RE2':
 ================
-RE2||RE2' =< RC2(chapéu)/20 aprox RC2/20= 235 ohm
-4k7||RE2' =< 235 => RE2' <= 247 ohm, escolho RE2'=220 ohm (substituir por 180 ohm, para dar 26dB)
+RE2||RE2' =< RC2(chapéu)/20 aprox RC2/20= 110 ohm
+2k2||RE2' =< 110 => RE2' <= 115 ohm, escolho RE2'=100 ohm (substituir por algum menor, para dar 26dB?)
 
 Capacitores de acoplamento:
 ===========================
@@ -74,20 +85,24 @@ Portanto, C = 342uF, escolho 390uF para os C infinitos.
 No laboratório, foi usado C = 470uF, em seguida, C=690uF (470u+220u), com a nova escolha de C, o tilt foi de 7%
 
 Desprezando a impedância de saída do emissor comum (supondo ser da ordem de dezenas de ohm ou menor), fazemos
-wmin*RE2'*C4>10 => C4 > 10/(377*180)=147uF, escolho C4=180uF (em paralelo com C4'=39nF)
+wmin*RE2'*C4>10 => C4 > 10/(377*100)=265uF, escolho C4=330uF (em paralelo com C4'=68nF)
 
 Desacoplamento LC:
 ==================
 Usaremos apenas o desacoplamento LC com L=100uH e C3=100uF (em paralelo com C3'=22nF)
 
+
+
 Frequência de corte:
 ====================
-Cin3 = 5.65pF (obtida simulando o CC no MatLAB)
+TALVEZ NÃO VALHA A PENA MENCIONAR, JÁ QUE A MODELAGEM ESTÁ MUITO CONFUSA
+Cin3 = 5.5pF (obtida simulando o CC no MatLAB)
+Rin3 = 600 ohm (da forma como foi polarizado, o polo do CC de saída está próximo de 4.2MHz)
 Do VCB do Q2 temos que Cu2 = 3.0pF
 CC2=Cu2+Cin3+Cw
-CC2 aprox 3pF+5.65pF+2pF = 10.65pF
+CC2 aprox 3pF+5.5pF+2pF = 10.5pF
 fH=1/(2*pi*RC2(chapéu)*CC2);
-RC2 aprox 2k2 e CC2 aprox 11pF => fH aprox 6.6 MHz
+RC2 = 2k2||600 aprox 470 ohm e CC2 aprox 11pF => fH aprox 6.6 MHz
 
 Medindo f para a ganho 0.707 do valor nominal (polo), temos fH aprox 4.5MHz.
 
